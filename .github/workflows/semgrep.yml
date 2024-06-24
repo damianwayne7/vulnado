@@ -32,5 +32,5 @@ jobs:
           echo "Vulnerabilities found"
           exit 1
         else
-          echo "No vulnerabilities found"
+          echo "No vulnerabilities found proceed with merge"
         fi
