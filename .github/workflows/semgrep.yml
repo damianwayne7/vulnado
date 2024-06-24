@@ -21,4 +21,15 @@ jobs:
       image: returntocorp/semgrep
     steps:
     - uses: actions/checkout@v3
-    - run: semgrep ci
+    - name: Run Semgrep scan
+      id: semgrep
+      run: semgrep ci --json > semgrep_results.json
+    - name: Check Semgrep results
+      id: check-results
+      run: |
+        if grep -q '"severity": "ERROR"' semgrep_results.json; then
+          echo "Vulnerabilities found"
+          exit 1
+        else
+          echo "No vulnerabilities found"
+        fi
