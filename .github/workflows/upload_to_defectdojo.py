@@ -5,11 +5,13 @@ from defectdojo_api import defectdojo
 DEFECTDOJO_URL = "http://13.213.67.252:8080"
 DEFECTDOJO_API_KEY = "1b9c5ac045cfec60f3b508e969a6d3b7d3f52247"
 DEFECTDOJO_ENGAGEMENT_ID = "linter_scan"
+DEFECTDOJO_USER = "admin"
 
 # Initialize the DefectDojo connection
 dojo = defectdojo.DefectDojoAPI(
     host=DEFECTDOJO_URL,
     api_key=DEFECTDOJO_API_KEY,
+    user=DEFECTDOJO_USER,
     verify_ssl=False  # Change to True if using HTTPS and a valid SSL certificate
 )
 
