@@ -68,7 +68,7 @@ jobs:
           OUTPUT_FOLDER: reports
 
       ##########################
-      # Upload Linter findings to DefectDojo #
+      # Install Python and DefectDojo API Client #
       ##########################
       - name: Install Python
         uses: actions/setup-python@v4
@@ -78,43 +78,12 @@ jobs:
       - name: Install DefectDojo API Client
         run: pip install defectdojo_api
 
+      ##########################
+      # Upload Linter findings to DefectDojo #
+      ##########################
       - name: Upload to DefectDojo
         env:
           DEFECTDOJO_URL: ${{ secrets.DEFECTDOJO_URL }}
           DEFECTDOJO_API_KEY: ${{ secrets.DEFECTDOJO_API_KEY }}
           DEFECTDOJO_ENGAGEMENT_ID: ${{ secrets.DEFECTDOJO_ENGAGEMENT_ID }}
-        run: |
-          import json
-          from defectdojo_api import defectdojo
-
-          # Initialize the DefectDojo connection
-          dojo = defectdojo.DefectDojoAPI(
-              host="${{ secrets.DEFECTDOJO_URL }}",
-              api_token="${{ secrets.DEFECTDOJO_API_KEY }}",
-              api_v2_key="${{ secrets.DEFECTDOJO_API_KEY }}",
-              user="",
-              verify_ssl=True
-          )
-
-          # Read the SARIF report
-          report_path = 'reports/super-linter.sarif'
-          try:
-            with open(report_path, 'r') as report_file:
-                report_content = json.load(report_file)
-
-            # Upload the report
-            response = dojo.upload_sarif(
-                engagement_id=${{ secrets.DEFECTDOJO_ENGAGEMENT_ID }},
-                file=report_content,
-                scan_type='Sarif',
-                active=True,
-                verified=False
-            )
-
-            if response.success:
-                print("Upload successful!")
-            else:
-                print(f"Upload failed: {response.message}")
-          except Exception as e:
-            print(f"Error reading or uploading report: {str(e)}")
-
+        run: python upload_to_defectdojo.py
