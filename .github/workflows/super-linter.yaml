@@ -8,6 +8,7 @@ name: Lint Code Base
 # Trigger the job on push and pull requests #
 ######################################
 on:
+  push:
   pull_request:
     branches: [master, release, develop]
 
@@ -34,13 +35,23 @@ jobs:
     ##################
     steps:
       ##########################
+      # Cache the linter's dependencies #
+      ##########################
+      - name: Cache Linter Dependencies
+        uses: actions/cache@v3
+        with:
+          path: /path/to/linter/cache
+          key: linter-cache-${{ runner.os }}-${{ hashFiles('**/*.yml') }}
+          restore-keys: |
+            linter-cache-${{ runner.os }}-
+
+      ##########################
       # Checkout the code base #
       ##########################
       - name: Checkout Code
         uses: actions/checkout@v4
         with:
-          # Full git history is needed to get a proper
-          # list of changed files within `super-linter`
+          # Only fetch the latest commit
           fetch-depth: 0
 
       ################################
@@ -52,3 +63,52 @@ jobs:
           VALIDATE_ALL_CODEBASE: true
           DEFAULT_BRANCH: master
           GITHUB_TOKEN: ${{ secrets.G_TOKEN }}
+          REPORT_OUTPUT: sarif
+          OUTPUT_FOLDER: reports
+
+      ##########################
+      # Upload Linter findings to DefectDojo #
+      ##########################
+      - name: Install Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+
+      - name: Install DefectDojo API Client
+        run: pip install defectdojo_api
+
+      - name: Upload to DefectDojo
+        env:
+          DEFECTDOJO_URL: ${{ secrets.DEFECTDOJO_URL }}
+          DEFECTDOJO_API_KEY: ${{ secrets.DEFECTDOJO_API_KEY }}
+          DEFECTDOJO_ENGAGEMENT_ID: ${{ secrets.DEFECTDOJO_ENGAGEMENT_ID }}
+        run: |
+          from defectdojo_api import defectdojo
+          import json
+
+          # Initialize the DefectDojo connection
+          dojo = defectdojo.DefectDojoAPI(
+              host="${{ secrets.DEFECTDOJO_URL }}",
+              api_token="${{ secrets.DEFECTDOJO_API_KEY }}",
+              api_v2_key="${{ secrets.DEFECTDOJO_API_KEY }}",
+              user="",
+              verify_ssl=True
+          )
+
+          # Read the SARIF report
+          with open('reports/super-linter.sarif', 'r') as report_file:
+              report_content = json.load(report_file)
+
+          # Upload the report
+          response = dojo.upload_sarif(
+              engagement_id=${{ secrets.DEFECTDOJO_ENGAGEMENT_ID }},
+              file=report_content,
+              scan_type='Sarif',
+              active=True,
+              verified=False
+          )
+
+          if response.success:
+              print("Upload successful!")
+          else:
+              print(f"Upload failed: {response.message}")
