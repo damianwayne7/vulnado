@@ -1,14 +1,12 @@
 import json
-from defectdojo_api import defectdojo
 import os
+from defectdojo_api import defectdojo
 
 # Initialize the DefectDojo connection
 dojo = defectdojo.DefectDojoAPI(
     host=os.environ["DEFECTDOJO_URL"],
-    api_token=os.environ["DEFECTDOJO_API_KEY"],
-    api_v2_key=os.environ["DEFECTDOJO_API_KEY"],
-    user="",
-    verify_ssl=True
+    api_key=os.environ["DEFECTDOJO_API_KEY"],
+    verify_ssl=False
 )
 
 # Read the SARIF report
