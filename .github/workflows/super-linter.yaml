@@ -1,31 +1,33 @@
-name: CodeQL Analysis
+name: Mega Linter Analysis
 
 on:
   push:
     branches:
-      - master
+      - master  # Trigger workflow on push to the master branch
 
 jobs:
-  codeql-analysis:
+  mega-linter:
     runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
 
     steps:
-    - name: Checkout repository
+    - name: Checkout code
       uses: actions/checkout@v2
 
-    - name: Initialize CodeQL
-      uses: github/codeql-action/init@v1
+    - name: Create lint-reports directory
+      run: mkdir -p /tmp/lint-reports
 
-    - name: Run CodeQL Analysis
-      uses: github/codeql-action/analyze@v1
-      with:
-        languages: javascript, python  # Specify the languages you want to analyze
-        query-languages: javascript   # Specify the CodeQL query language
+    - name: Run Mega-Linter
+      uses: oxsecurity/megalinter@v7
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        DEFAULT_BRANCH: master
+        OUTPUT_FORMAT: sarif
+        OUTPUT_FOLDER: /tmp/lint-reports
+        SARIF_REPORTER: true  # Enable SARIF report generation
+      continue-on-error: true
 
     - name: Upload SARIF file
-      uses: actions/upload-artifact@v2
+      if: success() || failure()
+      uses: github/codeql-action/upload-sarif@v2
       with:
-        name: codeql-results
-        path: ${{ github.workspace }}/codeql-bundle/codeql-sarif.sarif
+        sarif_file: /tmp/lint-reports/megalinter-report.sarif
