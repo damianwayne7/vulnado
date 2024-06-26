@@ -17,9 +17,9 @@ jobs:
       - name: Mega-Linter
         uses: oxsecurity/megalinter@v5
         with:
-          args: --report-output reports/megalinter_report
-          sarif: true
-          sarif_file: reports/megalinter.sarif
+          args: --report-output reports --sarif --formatters sarif
+        env:
+          DEFAULT_BRANCH: master
 
       - name: Check for SARIF Report
         run: |
