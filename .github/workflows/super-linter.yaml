@@ -14,7 +14,7 @@ jobs:
       uses: actions/checkout@v2
 
     - name: Create lint-reports directory
-      run: mkdir -p /tmp/lint-reports
+      run: mkdir -p /tmp/lint-reports/sarif
 
     - name: Run Mega-Linter
       uses: oxsecurity/megalinter@v7
@@ -22,12 +22,12 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         DEFAULT_BRANCH: master
         OUTPUT_FORMAT: sarif
-        OUTPUT_FOLDER: /tmp/lint-reports
+        OUTPUT_FOLDER: /tmp/lint-reports/sarif
         SARIF_REPORTER: true  # Enable SARIF report generation
       continue-on-error: true
 
-    - name: Upload SARIF file
+    - name: Upload SARIF files
       if: success() || failure()
       uses: github/codeql-action/upload-sarif@v2
       with:
-        sarif_file: /tmp/lint-reports/megalinter-report.sarif
+        sarif_file: /tmp/lint-reports/sarif/*.sarif
