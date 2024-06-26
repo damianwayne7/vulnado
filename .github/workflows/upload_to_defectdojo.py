@@ -7,21 +7,12 @@ DEFECTDOJO_API_KEY = "1b9c5ac045cfec60f3b508e969a6d3b7d3f52247"
 DEFECTDOJO_ENGAGEMENT_ID = "linter_scan"
 DEFECTDOJO_USER = "admin"
 
-class CustomDefectDojoAPI(defectdojo.DefectDojoAPI):
-    def __init__(self, host, api_key, user, verify_ssl):
-        # Custom initialization to fix the issue with the host.split('/')
-        self.api_key = api_key
-        self.user = user
-        self.verify_ssl = verify_ssl
-        self.host = host.rstrip('/')
-        self.api_v2_key = api_key  # Assuming api_key is for v2 API
-
-# Initialize the DefectDojo connection using the custom class
-dojo = CustomDefectDojoAPI(
+# Initialize the DefectDojo connection
+dojo = defectdojo.DefectDojoAPI(
     host=DEFECTDOJO_URL,
     api_key=DEFECTDOJO_API_KEY,
-    user=DEFECTDOJO_USER,
-    verify_ssl=False  # Change to True if using HTTPS and a valid SSL certificate
+    user="",
+    verify_ssl=False
 )
 
 # Read the SARIF report
@@ -30,10 +21,14 @@ try:
     with open(report_path, 'r') as report_file:
         report_content = json.load(report_file)
 
+    # Write the content to a file
+    with open('/tmp/super-linter.sarif', 'w') as tmp_report_file:
+        json.dump(report_content, tmp_report_file)
+
     # Upload the report
-    response = dojo.upload_sarif(
+    response = dojo.upload_sarif_scan(
         engagement_id=DEFECTDOJO_ENGAGEMENT_ID,
-        file=report_content,
+        file='/tmp/super-linter.sarif',
         scan_type='Sarif',
         active=True,
         verified=False
@@ -43,5 +38,7 @@ try:
         print("Upload successful!")
     else:
         print(f"Upload failed: {response.message}")
+except FileNotFoundError:
+    print(f"Error: Report file not found: {report_path}")
 except Exception as e:
     print(f"Error reading or uploading report: {str(e)}")
