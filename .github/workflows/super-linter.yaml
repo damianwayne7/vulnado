@@ -21,10 +21,10 @@ jobs:
         with:
           linter_name: 'ALL'
           sarif: true
-          github_token: ${{ secrets.G_TOKEN }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
         env:
           DEFAULT_BRANCH: master
-          GITHUB_TOKEN: ${{ secrets.G_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Upload SARIF to DefectDojo
         env:
