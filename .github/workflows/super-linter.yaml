@@ -34,31 +34,12 @@ jobs:
           DEFAULT_BRANCH: master
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           REPORT_OUTPUT_FOLDER: reports
-          OUTPUT_FORMAT: sarif
-          OUTPUT_DETAILS: simplified  # Generate SARIF output with simplified details
+          OUTPUT_DETAILS: detailed  # Output detailed details
 
-      - name: Ensure SARIF Report Exists
+      - name: Generate SARIF Report
         run: |
-          if [ ! -f reports/super-linter.sarif ]; then
-            echo "SARIF report not found! Creating dummy report..."
-            mkdir -p reports
-            echo '{
-              "$schema": "https://schemastore.azurewebsites.net/schemas/json/sarif-2.1.0.json",
-              "version": "2.1.0",
-              "runs": [
-                {
-                  "tool": {
-                    "driver": {
-                      "name": "Super-Linter",
-                      "informationUri": "https://github.com/github/super-linter",
-                      "rules": []
-                    }
-                  },
-                  "results": []
-                }
-              ]
-            }' > reports/super-linter.sarif
-          fi
+          python .github/workflows/generate_sarif_report.py
+        if: always()  # Always run this step even if previous steps fail
 
       - name: Install Python
         uses: actions/setup-python@v4
