@@ -61,11 +61,21 @@ jobs:
         uses: super-linter/super-linter@v5
         continue-on-error: true
         env:
-          VALIDATE_ALL_CODEBASE: false
+          VALIDATE_ALL_CODEBASE: true
           DEFAULT_BRANCH: master
           GITHUB_TOKEN: ${{ secrets.G_TOKEN }}
           REPORT_OUTPUT: sarif
           OUTPUT_FOLDER: reports
+
+      ##########################
+      # Check for SARIF Report #
+      ##########################
+      - name: Check for SARIF Report
+        run: |
+          if [ ! -f reports/super-linter.sarif ]; then
+            echo "SARIF report not found!"
+            exit 1
+          fi
 
       ##########################
       # Install Python and DefectDojo API Client #
@@ -82,8 +92,4 @@ jobs:
       # Upload Linter findings to DefectDojo #
       ##########################
       - name: Upload to DefectDojo
-        env:
-          DEFECTDOJO_URL: ${{ secrets.DEFECTDOJO_URL }}
-          DEFECTDOJO_API_KEY: ${{ secrets.DEFECTDOJO_API_KEY }}
-          DEFECTDOJO_ENGAGEMENT_ID: ${{ secrets.DEFECTDOJO_ENGAGEMENT_ID }}
         run: python .github/workflows/upload_to_defectdojo.py
