@@ -3,10 +3,10 @@ name: Lint and Upload to DefectDojo
 on:
   push:
     branches:
-      - master  # Adjust to your main branch name
+      - main  # Adjust to your main branch name
   pull_request:
     branches:
-      - master  # Adjust to your main branch name
+      - main  # Adjust to your main branch name
 
 jobs:
   lint-and-upload:
@@ -16,11 +16,13 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Set up Mega Linter
-        uses: megalinter/setup@v7
+      - name: Install Mega Linter
+        run: |
+          npm install -g mega-linter-runner
 
       - name: Run Mega Linter
-        run: npx mega-linter-runner --ci
+        run: |
+          mega-linter-runner --ci
 
       - name: Upload SARIF to DefectDojo
         env:
