@@ -29,10 +29,6 @@ jobs:
         run: |
           mega-linter-runner --linter=ALL -s /github/workspace -d
 
-      - name: Generate Dummy SARIF if not generated
-        if: success()
-        run: echo '{"version": "2.1.0","runs": []}' > /github/workspace/super-linter.sarif
-
       - name: Upload SARIF to DefectDojo
         if: success()
         env:
@@ -40,6 +36,10 @@ jobs:
           DEFECTDOJO_API_KEY: ${{ secrets.DEFECTDOJO_API_KEY }}
           DEFECTDOJO_ENGAGEMENT_ID: ${{ secrets.DEFECTDOJO_ENGAGEMENT_ID }}
         run: |
-          curl -X POST -H "Authorization: Token $DEFECTDOJO_API_KEY" \
-            -F "file=@/github/workspace/super-linter.sarif" \
-            $DEFECTDOJO_URL/api/v2/engagements/$DEFECTDOJO_ENGAGEMENT_ID/upload_sarif/
+          if [ -f /github/workspace/super-linter.sarif ]; then
+            curl -X POST -H "Authorization: Token $DEFECTDOJO_API_KEY" \
+              -F "file=@/github/workspace/super-linter.sarif" \
+              $DEFECTDOJO_URL/api/v2/engagements/$DEFECTDOJO_ENGAGEMENT_ID/upload_sarif/
+          else
+            echo "SARIF report not found!"
+          fi
