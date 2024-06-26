@@ -2,7 +2,7 @@ import json
 from defectdojo_api import defectdojo
 
 # Hardcoded DefectDojo connection details
-DEFECTDOJO_URL = "http://13.213.67.252:8080"
+DEFECTDOJO_URL = "http://13.213.67.252:8000"
 DEFECTDOJO_API_KEY = "1b9c5ac045cfec60f3b508e969a6d3b7d3f52247"
 DEFECTDOJO_ENGAGEMENT_ID = "linter_scan"
 DEFECTDOJO_USER = "admin"
