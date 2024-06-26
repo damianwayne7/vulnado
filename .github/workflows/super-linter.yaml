@@ -1,41 +1,33 @@
-name: Lint and Upload to DefectDojo
+name: Lint Code
 
 on:
   push:
     branches:
       - master
-  pull_request:
-    branches:
-      - master
 
 jobs:
-  lint-and-upload:
+  lint:
     runs-on: ubuntu-latest
-    
+
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
+    - name: Checkout code
+      uses: actions/checkout@v2
 
-      - name: Run MegaLinter
-        uses: oxsecurity/megalinter@v6
-        with:
-          linter_name: 'ALL'
-          sarif: true
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-        env:
-          DEFAULT_BRANCH: master
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - name: Run Mega-Linter
+      uses: oxsecurity/megalinter@v7
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        DEFAULT_BRANCH: master
+        OUTPUT_FORMAT: sarif
+        OUTPUT_FOLDER: /tmp/lint-reports
 
-      - name: Upload SARIF to DefectDojo
-        env:
-          DEFECTDOJO_URL: ${{ secrets.DEFECTDOJO_URL }}
-          DEFECTDOJO_API_KEY: ${{ secrets.DEFECTDOJO_API_KEY }}
-          DEFECTDOJO_ENGAGEMENT_ID: ${{ secrets.DEFECTDOJO_ENGAGEMENT_ID }}
-        run: |
-          if [ -f report/super-linter.sarif ]; then
-            curl -X POST -H "Authorization: Token $DEFECTDOJO_API_KEY" \
-              -F "file=@report/super-linter.sarif" \
-              $DEFECTDOJO_URL/api/v2/engagements/$DEFECTDOJO_ENGAGEMENT_ID/upload_sarif/
-          else
-            echo "SARIF report not found!"
-          fi
+    - name: List contents of the output folder
+      run: |
+        ls -al /tmp/lint-reports
+        pwd
+
+    - name: Upload SARIF file
+      uses: actions/upload-artifact@v3
+      with:
+        name: lint-results
+        path: /tmp/lint-reports/megalinter-reports.sarif
