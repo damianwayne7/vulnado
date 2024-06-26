@@ -1,4 +1,4 @@
-name: Lint Code
+name: CodeQL Analysis
 
 on:
   push:
@@ -6,30 +6,26 @@ on:
       - master
 
 jobs:
-  lint:
+  codeql-analysis:
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
 
     steps:
-    - name: Checkout code
+    - name: Checkout repository
       uses: actions/checkout@v2
 
-    - name: Run Mega-Linter
-      uses: oxsecurity/megalinter@v7
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        DEFAULT_BRANCH: master
-        OUTPUT_FORMAT: sarif
-        OUTPUT_FOLDER: /tmp/lint-reports
-      continue-on-error: true
+    - name: Initialize CodeQL
+      uses: github/codeql-action/init@v1
 
-    - name: List contents of the output folder
-      run: |
-        ls -al /tmp/lint-reports
-        pwd
+    - name: Run CodeQL Analysis
+      uses: github/codeql-action/analyze@v1
+      with:
+        languages: javascript, python  # Specify the languages you want to analyze
+        query-languages: javascript   # Specify the CodeQL query language
 
     - name: Upload SARIF file
-      if: always()  # Upload SARIF file even if previous steps failed
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v2
       with:
-        name: lint-results
-        path: /tmp/lint-reports/megalinter-reports.sarif
+        name: codeql-results
+        path: ${{ github.workspace }}/codeql-bundle/codeql-sarif.sarif
