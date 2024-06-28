@@ -25,6 +25,8 @@ jobs:
         OUTPUT_FOLDER: /tmp/lint-reports/sarif
         SARIF_REPORTER: true  # Enable SARIF report generation
       continue-on-error: true
+    - name: Verify SARIF report exists
+      run: ls -l /tmp/lint-reports/sarif/megalinter-report.sarif
 
     - name: Upload SARIF files
       if: success() || failure()
