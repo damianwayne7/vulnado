@@ -1,4 +1,4 @@
-name: ESLint SARIF Report
+name: Super Linter
 
 on:
   push:
@@ -10,26 +10,26 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v2
+        uses: actions/checkout@v2
+      
+      - name: Create reports folder
+        run: mkdir reports
+      
+      - name: List files in reports folder before linting
+        run: ls -l reports
+      
+      - name: Run Super Linter
+        id: super-linter
+        uses: github/super-linter@v4
+        env:
+          VALIDATE_ALL_CODEBASE: true
+          DEFAULT_WORKSPACE: ${{ github.workspace }}
+          OUTPUT_FORMAT: json
         with:
-          node-version: '14'
-
-      - name: Install ESLint and dependencies
-        run: |
-          npm install eslint@latest @babel/core @babel/eslint-parser @microsoft/eslint-formatter-sarif
-
-      - name: Run ESLint with SARIF output
-        run: npx eslint . --ext .js,.jsx -f @microsoft/eslint-formatter-sarif -o eslint-report.sarif || true
-
-      - name: Verify ESLint SARIF report
-        run: ls -l eslint-report.sarif || echo "ESLint SARIF report not found"
-
-      - name: Upload ESLint SARIF report
-        if: success() && steps.lint.outputs.exit-code == '0'
-        uses: actions/upload-artifact@v2
-        with:
-          name: eslint-sarif-report
-          path: eslint-report.sarif
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Save linter output to file
+        run: echo "${{ steps.super-linter.outputs.linter-output }}" > reports/linter-output.json
+      
+      - name: List files in reports folder after linting
+        run: ls -l reports
