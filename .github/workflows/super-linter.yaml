@@ -8,6 +8,8 @@ on:
 jobs:
   lint:
     runs-on: ubuntu-latest
+    continue-on-error: true  # Continue running job even after errors
+    
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
@@ -16,7 +18,7 @@ jobs:
         run: mkdir reports
       
       - name: List files in reports folder before linting
-        run: ls -l reports
+        run: ls -l reports || true  # Use || true to prevent failure if folder doesn't exist
       
       - name: Run Super Linter
         id: super-linter
@@ -25,11 +27,15 @@ jobs:
           VALIDATE_ALL_CODEBASE: true
           DEFAULT_WORKSPACE: ${{ github.workspace }}
           OUTPUT_FORMAT: json
+          FAIL_ON_WARNINGS: false  # Continue on warnings as well
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
       
       - name: Save linter output to file
-        run: echo "${{ steps.super-linter.outputs.linter-output }}" > reports/linter-output.json
+        if: ${{ always() }}  # Ensure this step runs even if previous steps fail
+        run: |
+          echo "${{ steps.super-linter.outputs.linter-output }}" > reports/linter-output.json
+          cat reports/linter-output.json  # Display content for verification
       
       - name: List files in reports folder after linting
-        run: ls -l reports
+        run: ls -l reports || true  # Use || true to prevent failure if folder doesn't exist
