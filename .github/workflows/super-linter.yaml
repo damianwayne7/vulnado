@@ -32,9 +32,9 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
       
       - name: Save linter output to file
-        if: ${{ always() }}  # Ensure this step runs even if previous steps fail
+        if: always()  # Ensure this step runs even if previous steps fail
         run: |
-          echo "${{ steps.super-linter.outputs.linter-output }}" > reports/linter-output.json
+          echo "${{ toJson(steps.super-linter.outputs) }}" > reports/linter-output.json
           cat reports/linter-output.json  # Display content for verification
       
       - name: List files in reports folder after linting
