@@ -1,35 +1,58 @@
-name: Mega Linter Analysis
+name: Multi-Language Linting
 
 on:
   push:
     branches:
-      - master  # Trigger workflow on push to the master branch
+      - master
 
 jobs:
-  mega-linter:
+  lint:
     runs-on: ubuntu-latest
-
     steps:
     - name: Checkout code
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
 
-    - name: Create lint-reports directory
-      run: mkdir -p /tmp/lint-reports/sarif
-
-    - name: Run Mega-Linter
-      uses: oxsecurity/megalinter@v7
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        DEFAULT_BRANCH: master
-        OUTPUT_FORMAT: sarif
-        OUTPUT_FOLDER: /tmp/lint-reports/sarif
-        SARIF_REPORTER: true  # Enable SARIF report generation
-      continue-on-error: true
-    - name: Verify SARIF report exists
-      run: ls -l /tmp/lint-reports/sarif/megalinter-report.sarif
-
-    - name: Upload SARIF files
-      if: success() || failure()
-      uses: github/codeql-action/upload-sarif@v2
+    # ESLint for JavaScript/React
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
       with:
-        sarif_file: /tmp/lint-reports/sarif/*.sarif
+        node-version: '16'
+
+    - name: Install ESLint
+      run: npm install eslint @microsoft/eslint-formatter-sarif
+
+    - name: Run ESLint
+      run: npx eslint . --ext .js,.jsx -f @microsoft/eslint-formatter-sarif -o eslint-report.sarif
+
+    - name: Verify ESLint SARIF report
+      run: ls -l eslint-report.sarif
+
+    # Checkstyle for Java
+    - name: Setup Java
+      uses: actions/setup-java@v3
+      with:
+        java-version: '11'
+
+    - name: Install Checkstyle
+      run: |
+        curl -LJO https://github.com/checkstyle/checkstyle/releases/download/checkstyle-10.7.0/checkstyle-10.7.0-all.jar
+        wget -O google_checks.xml https://raw.githubusercontent.com/checkstyle/checkstyle/master/src/main/resources/google_checks.xml
+
+    - name: Run Checkstyle
+      run: java -jar checkstyle-10.7.0-all.jar -c google_checks.xml -f sarif -o checkstyle-report.sarif . 
+
+    - name: Verify Checkstyle SARIF report
+      run: ls -l checkstyle-report.sarif
+
+    # Upload SARIF files
+    - name: Upload ESLint SARIF report
+      uses: actions/upload-artifact@v3
+      with:
+        name: eslint-sarif-report
+        path: eslint-report.sarif
+
+    - name: Upload Checkstyle SARIF report
+      uses: actions/upload-artifact@v3
+      with:
+        name: checkstyle-sarif-report
+        path: checkstyle-report.sarif
