@@ -1,4 +1,4 @@
-name: Multi-Language Linting
+name: Super-Linter
 
 on:
   push:
@@ -9,41 +9,22 @@ jobs:
   lint:
     runs-on: ubuntu-latest
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v3
+      - name: Checkout code
+        uses: actions/checkout@v3
 
-    # ESLint for JavaScript/React
-    - name: Setup Node.js
-      uses: actions/setup-node@v3
-      with:
-        node-version: '16'
+      - name: Run Super-Linter
+        uses: github/super-linter@v5
+        env:
+          VALIDATE_ALL_CODEBASE: false
+          DEFAULT_BRANCH: master
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          OUTPUT_FORMAT: json
 
-    - name: Install ESLint and SARIF formatter
-      run: |
-        npm install eslint
-        npm install -g @microsoft/eslint-formatter-sarif
+      - name: Verify JSON report exists
+        run: ls -l lint-results/*.json
 
-    - name: Run ESLint
-      run: npx eslint . -f @microsoft/eslint-formatter-sarif -o eslint-report.sarif
-      continue-on-error: true
-
-    - name: Verify ESLint SARIF report
-      run: ls -l eslint-report.sarif
-
-    # Checkstyle for Java
-    - name: Setup Java
-      uses: actions/setup-java@v3
-      with:
-        java-version: '11'
-
-    - name: Install Checkstyle
-      run: |
-        curl -LJO https://github.com/checkstyle/checkstyle/releases/download/checkstyle-10.7.0/checkstyle-10.7.0-all.jar
-        wget -O google_checks.xml https://raw.githubusercontent.com/checkstyle/checkstyle/master/src/main/resources/google_checks.xml
-
-    - name: Run Checkstyle
-      run: java -jar checkstyle-10.7.0-all.jar -c google_checks.xml -f sarif -o checkstyle-report.sarif .
-
-    - name: Verify Checkstyle SARIF report
-      run: ls -l checkstyle-report.sarif
-
+      - name: Upload JSON file
+        uses: actions/upload-artifact@v3
+        with:
+          name: super-linter-results
+          path: lint-results/*.json
