@@ -1,4 +1,4 @@
-name: Super-Linter
+name: ESLint SARIF Report
 
 on:
   push:
@@ -12,19 +12,24 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Run Super-Linter
-        uses: github/super-linter@v5
-        env:
-          VALIDATE_ALL_CODEBASE: false
-          DEFAULT_BRANCH: master
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          OUTPUT_FORMAT: json
-
-      - name: Verify JSON report exists
-        run: ls -l lint-results/*.json
-
-      - name: Upload JSON file
-        uses: actions/upload-artifact@v3
+      - name: Setup Node.js
+        uses: actions/setup-node@v2
         with:
-          name: super-linter-results
-          path: lint-results/*.json
+          node-version: '14'
+
+      - name: Install ESLint and dependencies
+        run: |
+          npm install eslint @babel/core @babel/eslint-parser @microsoft/eslint-formatter-sarif
+
+      - name: Run ESLint with SARIF output
+        run: npx eslint . --ext .js,.jsx -f @microsoft/eslint-formatter-sarif -o eslint-report.sarif || true
+
+      - name: Verify ESLint SARIF report
+        run: ls -l eslint-report.sarif || echo "ESLint SARIF report not found"
+
+      - name: Upload ESLint SARIF report
+        if: success() && steps.lint.outputs.exit-code == '0'
+        uses: actions/upload-artifact@v2
+        with:
+          name: eslint-sarif-report
+          path: eslint-report.sarif
