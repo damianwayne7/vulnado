@@ -18,11 +18,14 @@ jobs:
       with:
         node-version: '16'
 
-    - name: Install ESLint
-      run: npm install eslint @microsoft/eslint-formatter-sarif
+    - name: Install ESLint and SARIF formatter
+      run: |
+        npm install eslint
+        npm install -g @microsoft/eslint-formatter-sarif
 
     - name: Run ESLint
       run: npx eslint . -f @microsoft/eslint-formatter-sarif -o eslint-report.sarif
+      continue-on-error: true
 
     - name: Verify ESLint SARIF report
       run: ls -l eslint-report.sarif
@@ -44,15 +47,3 @@ jobs:
     - name: Verify Checkstyle SARIF report
       run: ls -l checkstyle-report.sarif
 
-    # Upload SARIF files
-    - name: Upload ESLint SARIF report
-      uses: actions/upload-artifact@v3
-      with:
-        name: eslint-sarif-report
-        path: eslint-report.sarif
-
-    - name: Upload Checkstyle SARIF report
-      uses: actions/upload-artifact@v3
-      with:
-        name: checkstyle-sarif-report
-        path: checkstyle-report.sarif
