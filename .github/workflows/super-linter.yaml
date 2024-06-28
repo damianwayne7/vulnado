@@ -15,7 +15,7 @@ jobs:
         uses: actions/checkout@v2
       
       - name: Create reports folder
-        run: mkdir reports
+        run: mkdir -p reports
       
       - name: List files in reports folder before linting
         run: ls -l reports || true  # Use || true to prevent failure if folder doesn't exist
