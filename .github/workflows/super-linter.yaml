@@ -22,7 +22,7 @@ jobs:
       run: npm install eslint @microsoft/eslint-formatter-sarif
 
     - name: Run ESLint
-      run: npx eslint . --ext .js,.jsx -f @microsoft/eslint-formatter-sarif -o eslint-report.sarif
+      run: npx eslint . -f @microsoft/eslint-formatter-sarif -o eslint-report.sarif
 
     - name: Verify ESLint SARIF report
       run: ls -l eslint-report.sarif
@@ -39,7 +39,7 @@ jobs:
         wget -O google_checks.xml https://raw.githubusercontent.com/checkstyle/checkstyle/master/src/main/resources/google_checks.xml
 
     - name: Run Checkstyle
-      run: java -jar checkstyle-10.7.0-all.jar -c google_checks.xml -f sarif -o checkstyle-report.sarif . 
+      run: java -jar checkstyle-10.7.0-all.jar -c google_checks.xml -f sarif -o checkstyle-report.sarif .
 
     - name: Verify Checkstyle SARIF report
       run: ls -l checkstyle-report.sarif
