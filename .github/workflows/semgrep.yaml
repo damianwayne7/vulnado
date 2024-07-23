@@ -35,4 +35,5 @@ jobs:
           --host $DEFECTDOJO_URL \
           --product $PRODUCT_NAME \
           --engagement $ENGAGEMENT_NAME \
-          --report semgrep_results.json
+          --report semgrep_results.json \
+          --is_new_import
