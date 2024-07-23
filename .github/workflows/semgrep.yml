@@ -34,3 +34,19 @@ jobs:
         else
           echo "No vulnerabilities found proceed with merge"
         fi
+    - name: Upload Semgrep report to DefectDojo
+      env:
+        DEFECT_DOJO_API_TOKEN: ${{ secrets.DEFECT_DOJO_API_TOKEN }}
+        DEFECTDOJO_URL: ${{ secrets.DEFECTDOJO_URL }}
+        PRODUCT_NAME: ${{ secrets.PRODUCT_NAME }}
+        ENGAGEMENT_NAME: ${{ secrets.ENGAGEMENT_NAME }}
+      run: |
+        pip install requests
+        curl -O https://raw.githubusercontent.com/your-repo/path-to-script/upload_semgrep_to_defectdojo.py
+        python upload_semgrep_to_defectdojo.py \
+          --host $DEFECTDOJO_URL \
+          --token $DEFECT_DOJO_API_TOKEN \
+          --product $PRODUCT_NAME \
+          --engagement $ENGAGEMENT_NAME \
+          --report report.json \
+          --is_new_import
