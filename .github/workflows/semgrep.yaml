@@ -5,7 +5,7 @@ on:
       - master
       - develop
     paths:
-      - .github/workflows/semgrep-defectdojo.yml
+      - .github/workflows/semgrep.yaml
   schedule:
     - cron: '25 3 * * *'  # Scheduled runs
 
