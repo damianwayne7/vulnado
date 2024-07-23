@@ -9,10 +9,9 @@ on:
       - master
       - develop
     paths:
-      - .github/workflows/semgrep.yml
+      - .github/workflows/semgrep-defectdojo.yml
   schedule:
-    # Run daily at 03:25 UTC
-    - cron: "25 3 * * *"
+    - cron: '25 3 * * *' # random HH:MM to avoid a load spike on GitHub Actions at 00:00
 
 jobs:
   semgrep:
@@ -30,16 +29,14 @@ jobs:
 
     - name: Upload Semgrep report to DefectDojo
       env:
-        DEFECT_DOJO_API_TOKEN: ${{ secrets.DEFECT_DOJO_API_KEY }}
-        DEFECTDOJO_URL: ${{ secrets.DEFECTDOJO_URL }}
+        DEFECT_DOJO_API_TOKEN: 1b9c5ac045cfec60f3b508e969a6d3b7d3f52247
+        DEFECTDOJO_URL: http://13.213.67.252:8080
         PRODUCT_NAME: ${{ secrets.PRODUCT_NAME }}
         ENGAGEMENT_NAME: ${{ secrets.ENGAGEMENT_NAME }}
       run: |
         pip install requests
         python .github/workflows/upload_semgrep_to_defectdojo.py \
-          --host http://13.213.67.252:8080 \
-          --token 1b9c5ac045cfec60f3b508e969a6d3b7d3f52247 \
+          --host $DEFECTDOJO_URL \
           --product $PRODUCT_NAME \
           --engagement $ENGAGEMENT_NAME \
-          --report semgrep_results.json \
-          --is_new_import
+          --report semgrep_results.json
