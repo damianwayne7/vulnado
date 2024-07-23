@@ -31,4 +31,4 @@ jobs:
         ENGAGEMENT_NAME: ${{ secrets.ENGAGEMENT_NAME }}
       run: |
         pip install requests
-        python3 .github/workflows/upload_semgrep_to_defectdojo.py --host $DEFECTDOJO_URL --product $PRODUCT_NAME --engagement $ENGAGEMENT_NAME --report semgrep_results.json || true
+        python3 .github/workflows/upload_semgrep_to_defectdojo.py --host $DEFECTDOJO_URL --product $PRODUCT_NAME --engagement $ENGAGEMENT_NAME --report semgrep_results.json
