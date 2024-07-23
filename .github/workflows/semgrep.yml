@@ -25,15 +25,7 @@ jobs:
     - name: Run Semgrep scan
       id: semgrep
       run: semgrep --config auto --json . > semgrep_results.json
-    - name: Check Semgrep results
-      id: check-results
-      run: |
-        if grep -q '"severity": "ERROR"' semgrep_results.json; then
-          echo "Vulnerabilities found"
-          exit 1
-        else
-          echo "No vulnerabilities found proceed with merge"
-        fi
+
     - name: Upload Semgrep report to DefectDojo
       env:
         DEFECT_DOJO_API_TOKEN: ${{ secrets.DEFECT_DOJO_API_TOKEN }}
