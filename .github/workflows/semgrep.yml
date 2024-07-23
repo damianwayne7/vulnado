@@ -28,8 +28,8 @@ jobs:
 
     - name: Upload Semgrep report to DefectDojo
       env:
-        DEFECT_DOJO_API_TOKEN: 1b9c5ac045cfec60f3b508e969a6d3b7d3f52247
-        DEFECTDOJO_URL: http://13.213.67.252:8080
+        DEFECT_DOJO_API_TOKEN: "1b9c5ac045cfec60f3b508e969a6d3b7d3f52247"
+        DEFECTDOJO_URL: "http://13.213.67.252:8080"
         PRODUCT_NAME: ${{ secrets.PRODUCT_NAME }}
         ENGAGEMENT_NAME: ${{ secrets.ENGAGEMENT_NAME }}
       run: |
