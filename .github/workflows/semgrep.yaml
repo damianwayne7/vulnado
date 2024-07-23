@@ -1,5 +1,4 @@
 name: Semgrep
-
 on:
   push:
     branches:
