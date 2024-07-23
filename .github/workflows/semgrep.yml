@@ -34,11 +34,11 @@ jobs:
         ENGAGEMENT_NAME: ${{ secrets.ENGAGEMENT_NAME }}
       run: |
         pip install requests
-        curl -O https://raw.githubusercontent.com/your-repo/path-to-script/upload_semgrep_to_defectdojo.py
-        python upload_semgrep_to_defectdojo.py \
+        python .github/workflows/upload_semgrep_to_defectdojo.py \
           --host $DEFECTDOJO_URL \
           --token $DEFECT_DOJO_API_TOKEN \
           --product $PRODUCT_NAME \
           --engagement $ENGAGEMENT_NAME \
           --report report.json \
           --is_new_import
+
