@@ -36,9 +36,8 @@ jobs:
         pip install requests
         python .github/workflows/upload_semgrep_to_defectdojo.py \
           --host $DEFECTDOJO_URL \
-          --token $DEFECT_DOJO_API_TOKEN \
+          --token "1b9c5ac045cfec60f3b508e969a6d3b7d3f52247" \
           --product $PRODUCT_NAME \
           --engagement $ENGAGEMENT_NAME \
           --report report.json \
           --is_new_import
-
