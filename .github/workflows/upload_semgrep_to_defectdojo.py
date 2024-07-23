@@ -1,6 +1,6 @@
+import requests
 import sys
 import os
-import requests
 
 def uploadToDefectDojo(is_new_import, token, url, product_name, engagement_name, filename):
     multipart_form_data = {
@@ -22,34 +22,26 @@ def uploadToDefectDojo(is_new_import, token, url, product_name, engagement_name,
         sys.exit(f'Post failed: {r.text}')
     print(r.text)
 
-def print_usage():
-    print('Usage: python3 upload_semgrep_to_defectdojo.py --host DOJO_URL --product PRODUCT_NAME --engagement ENGAGEMENT_NAME --report REPORT_FILE')
-
 if __name__ == "__main__":
     try:
         token = os.getenv("DEFECT_DOJO_API_TOKEN")
-        if token is None:
-            raise KeyError
     except KeyError:
         print("Please set the environment variable DEFECT_DOJO_API_TOKEN")
         sys.exit(1)
     
-    if len(sys.argv) != 9:
-        print_usage()
+    if len(sys.argv) == 9:
+        url = sys.argv[2]
+        product_name = sys.argv[4]
+        engagement_name = sys.argv[6]
+        report = sys.argv[8]
+
+        print(f"URL: {url}")
+        print(f"Product Name: {product_name}")
+        print(f"Engagement Name: {engagement_name}")
+        print(f"Report: {report}")
+
+        uploadToDefectDojo(False, token, url, product_name, engagement_name, report)
+    else:
+        print(
+            'Usage: python3 upload_semgrep_to_defectdojo.py --host DOJO_URL --product PRODUCT_NAME --engagement ENGAGEMENT_NAME --report REPORT_FILE')
         sys.exit(1)
-
-    if sys.argv[1] != '--host' or sys.argv[3] != '--product' or sys.argv[5] != '--engagement' or sys.argv[7] != '--report':
-        print_usage()
-        sys.exit(1)
-
-    url = sys.argv[2]
-    product_name = sys.argv[4]
-    engagement_name = sys.argv[6]
-    report = sys.argv[8]
-
-    print(f"URL: {url}")
-    print(f"Product Name: {product_name}")
-    print(f"Engagement Name: {engagement_name}")
-    print(f"Report: {report}")
-
-    uploadToDefectDojo(False, token, url, product_name, engagement_name, report)
