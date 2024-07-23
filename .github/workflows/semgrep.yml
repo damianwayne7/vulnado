@@ -28,7 +28,7 @@ jobs:
 
     - name: Upload Semgrep report to DefectDojo
       env:
-        DEFECT_DOJO_API_TOKEN: ${{ secrets.DEFECT_DOJO_API_TOKEN }}
+        DEFECT_DOJO_API_TOKEN: ${{ secrets.DEFECT_DOJO_API_KEY }}
         DEFECTDOJO_URL: ${{ secrets.DEFECTDOJO_URL }}
         PRODUCT_NAME: ${{ secrets.PRODUCT_NAME }}
         ENGAGEMENT_NAME: ${{ secrets.ENGAGEMENT_NAME }}
