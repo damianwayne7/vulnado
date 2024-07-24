@@ -1,6 +1,7 @@
 import requests
 import sys
 import os
+import argparse
 
 def uploadToDefectDojo(is_new_import, token, url, product_name, engagement_name, filename):
     multipart_form_data = {
@@ -20,18 +21,22 @@ def uploadToDefectDojo(is_new_import, token, url, product_name, engagement_name,
     )
     if response.status_code != 200:
         sys.exit(f'Post failed: {response.text}')
-    print(response.text)
+    print("Upload successful.")
+    print(response.json())
 
 if __name__ == "__main__":
-    if len(sys.argv) == 9:
-        token = os.getenv("DEFECT_DOJO_API_TOKEN")
-        if token is None:
-            print("Please set the environment variable DEFECT_DOJO_API_TOKEN")
-            sys.exit(1)
-        url = sys.argv[2]
-        product_name = sys.argv[4]
-        engagement_name = sys.argv[6]
-        report = sys.argv[8]
-        uploadToDefectDojo(False, token, url, product_name, engagement_name, report)
-    else:
-        print('Usage: python3 upload_semgrep_to_defectdojo.py --host DOJO_URL --product PRODUCT_NAME --engagement ENGAGEMENT_NAME --report REPORT_FILE')
+    parser = argparse.ArgumentParser(description='Upload Semgrep results to DefectDojo.')
+    parser.add_argument('--host', required=True, help='DefectDojo host URL')
+    parser.add_argument('--product', required=True, help='Product name in DefectDojo')
+    parser.add_argument('--engagement', required=True, help='Engagement name in DefectDojo')
+    parser.add_argument('--report', required=True, help='Path to the Semgrep report file')
+    parser.add_argument('--is_new_import', action='store_true', help='Flag to indicate if this is a new import')
+
+    args = parser.parse_args()
+
+    token = os.getenv("DEFECT_DOJO_API_TOKEN")
+    if not token:
+        print("Please set the environment variable DEFECT_DOJO_API_TOKEN")
+        sys.exit(1)
+
+    uploadToDefectDojo(args.is_new_import, token, args.host, args.product, args.engagement, args.report)
