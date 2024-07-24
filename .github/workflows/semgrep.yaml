@@ -1,5 +1,4 @@
 name: Semgrep
-
 on:
   push:
     branches:
@@ -16,6 +15,10 @@ jobs:
     runs-on: ubuntu-20.04
     env:
       SEMGREP_APP_TOKEN: ${{ secrets.SEMGREP_APP_TOKEN }}
+      DEFECT_DOJO_API_TOKEN: ${{ secrets.DEFECT_DOJO_API_TOKEN }}
+      DEFECTDOJO_URL: ${{ secrets.DEFECTDOJO_URL }}
+      PRODUCT_NAME: ${{ secrets.PRODUCT_NAME }}
+      ENGAGEMENT_NAME: ${{ secrets.ENGAGEMENT_NAME }}
     container:
       image: returntocorp/semgrep
     steps:
@@ -25,11 +28,6 @@ jobs:
       run: semgrep --config auto --json . > semgrep_results.json
 
     - name: Upload Semgrep report to DefectDojo
-      env:
-        DEFECT_DOJO_API_TOKEN: 1b9c5ac045cfec60f3b508e969a6d3b7d3f52247
-        DEFECTDOJO_URL: http://13.213.67.252:8080
-        PRODUCT_NAME: ${{ secrets.PRODUCT_NAME }}
-        ENGAGEMENT_NAME: ${{ secrets.ENGAGEMENT_NAME }}
       run: |
         # Debug: Print environment variables to ensure they are set correctly
         echo "DEFECT_DOJO_API_TOKEN: $DEFECT_DOJO_API_TOKEN"
@@ -42,6 +40,9 @@ jobs:
         
         # Install required Python packages
         pip install requests
+        
+        # Export DEFECT_DOJO_API_TOKEN environment variable
+        export DEFECT_DOJO_API_TOKEN=$DEFECT_DOJO_API_TOKEN
         
         # Run the Python script to upload the report
         python3 .github/workflows/upload_semgrep_to_defectdojo.py \
