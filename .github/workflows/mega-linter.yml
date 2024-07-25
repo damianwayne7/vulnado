@@ -31,3 +31,10 @@ jobs:
         uses: github/codeql-action/upload-sarif@v2
         with:
           sarif_file: 'megalinter-reports/megalinter-report.sarif'
+          
+      - name: Upload SARIF report as artifact
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: megalinter-report
+          path: megalinter-reports/megalinter-report.sarif
