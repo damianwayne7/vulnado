@@ -14,13 +14,8 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '16'
-
       - name: Run MegaLinter
-        uses: nvuillam/mega-linter@v5
+        uses: oxsecurity/megalinter@v6
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           PRINT_ALPACA: 'false'
@@ -28,8 +23,11 @@ jobs:
           SARIF_REPORTER: 'true'
           SARIF_REPORTER_FILE_NAME: 'megalinter-report.sarif'
 
+      - name: List generated reports for debugging
+        run: ls -R
+
       - name: Upload MegaLinter scan results to GitHub Security tab
-        if: success() || failure()
+        if: always()
         uses: github/codeql-action/upload-sarif@v2
         with:
           sarif_file: 'megalinter-reports/megalinter-report.sarif'
