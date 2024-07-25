@@ -1,0 +1,35 @@
+name: MegaLinter
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+
+jobs:
+  mega-linter:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '16'
+
+      - name: Run MegaLinter
+        uses: nvuillam/mega-linter@v5
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PRINT_ALPACA: 'false'
+          OUTPUT_FORMAT: 'sarif'
+          SARIF_REPORTER: 'true'
+          SARIF_REPORTER_FILE_NAME: 'megalinter-report.sarif'
+
+      - name: Upload MegaLinter scan results to GitHub Security tab
+        if: success() || failure()
+        uses: github/codeql-action/upload-sarif@v2
+        with:
+          sarif_file: 'megalinter-reports/megalinter-report.sarif'
