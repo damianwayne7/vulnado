@@ -11,7 +11,7 @@ This application and exercises will take you through some of the OWASP top 10 Vu
 5. Open a browser and navigate to the client to make sure it's working: [http://localhost:1337](http://localhost:1337)
 6. Then back in your terminal verify you have connection to your API server: `nc -vz localhost 8080`
 
-## Architecture
+## Architecture......
 
 The docker network created by `docker-compose` maps pretty well to a multi-tier architecture where a web server is publicly available and there are other network resources like a database and internal site that are not publicly available.
 
