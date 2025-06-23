@@ -1,0 +1,40 @@
+# .github/workflows/deploy-qa.yaml
+name: QA Build & Sonar Scan
+
+on:
+  push:
+    branches:
+      - develop
+  pull_request:
+
+jobs:
+  build:
+    name: Build for Sonar
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Install dependencies
+        run: |
+          # e.g. for Node:
+          # npm ci
+
+          # or for Java/Maven:
+          # mvn install -DskipTests
+
+      - name: Build project
+        run: |
+          # e.g. for Node:
+          # npm run build
+
+          # or for Java/Maven:
+          # mvn clean package -DskipTests
+
+  sonar:
+    name: SonarQube Scan
+    needs: build
+    uses: mpulsemobile/devops-cicd/.github/workflows/scan.yaml@damianwayne7-patch-1
+    with:
+      env: qa
+    secrets: inherit
